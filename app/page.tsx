@@ -1,6 +1,6 @@
 import Image from "next/image";
 import AgentPulse from "./components/AgentPulse";
-import { features, steps } from "./constants";
+import { APP_NAME, features, steps } from "./constants";
 import Footer from "./components/Footer";
 import YouTubeVideoForm from "./components/YouTubeVideoForm";
 
@@ -8,21 +8,18 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       {/* Hero section */}
-      <section className="py-20 bg-gradient-to-b from-white to-gray-50">
+      <section className="py-20 bg-gradient-to-b from-white to-gray-50">        
         <div className="container mx-auto px-4">
           <div className="flex flex-col items-center gap-10 text-center mb-12">
-            <AgentPulse size="large" color="purple" />
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-600 mb-6">
-              Meet Your Personal {" "}
-              <span className="bg-gradient-to-r from-purple-600 to-purple-400 bg-clip-text text-transparent">
-                Content Creator
-              </span>
-            </h1>
+            {/* <AgentPulse size="large" color="purple" /> */}
+            <h1 className="text-4xl md:text-6xl font-bold text-purple-400 mb-6">{APP_NAME}</h1>
 
-            <p className="text-xl text-gray-500 mb-8 max-w-2xl mx-auto">
-              Transform your video content with AI-powered analysis,
+            <h2 className="text-4xl md:text-6xl font-bold text-gray-600 mb-6">
+            Transform your video content with AI-powered analysis, {" "}
+              <span className="bg-gradient-to-r from-purple-600 to-purple-400 bg-clip-text text-transparent">
               transcription, and insights. Get started in seconds.
-            </p>
+              </span>
+            </h2>
 
             {/* YouTube video Form */}
             <YouTubeVideoForm />
@@ -34,7 +31,10 @@ export default function Home() {
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4 max-w-6xl">
           <h2 className="text-3xl font-bold text-center mb-12">
-            Unlock Powerful Features for Content Creators
+            Unlock Powerful Features for {" "}            
+            <span className="bg-gradient-to-r from-purple-600 to-purple-400 bg-clip-text text-transparent">
+            Content Creators
+              </span>
           </h2>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -44,7 +44,7 @@ export default function Home() {
               return (
                 <div
                   key={index}
-                  className="bg-white p-6 rounded-xl border border-gray-200 hover:border-blue-500 transition-all duration-300"
+                  className="bg-white p-6 rounded-xl border border-gray-200 hover:border-purple-500 transition-all duration-300"
                 >
                   <div
                     className={`w-12 h-12 rounded-lg flex items-center justify-center mb-4 ${feature.iconBg}`}
