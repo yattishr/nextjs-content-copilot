@@ -8,7 +8,7 @@ function Footer() {
         <h2 className='text-3xl font-bold text-white mb-6 flex items-center justify-center'>
           Prepare to meet your AI Content Agent <BotIcon className='ml-2' />
         </h2>
-        <p className='text-xl text-blue-50'>Join creators leveraging AI to unlock content insights.</p>
+        <p className='text-xl text-blue-50'>Join thousands of creators already leveraging AI to unlock content insights.</p>
       </div>
     </section>
   )

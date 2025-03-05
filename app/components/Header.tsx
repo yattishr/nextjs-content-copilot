@@ -4,6 +4,34 @@ import { APP_NAME, features } from "../constants";
 import AgentPulse from "./AgentPulse";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuIndicator,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  NavigationMenuViewport,
+} from "@/components/ui/navigation-menu"
+import { SchematicClient } from "@schematichq/schematic-typescript-node"
+import NavMenu from "./NavMenu";
+
+
+async function getPaymentPlan() { 
+  const apiKey = process.env.NEXT_PUBLIC_SCHEMATIC_PUBLISHABLE_KEY
+  if (!apiKey) throw new Error('Schematic API key not found')
+  
+  const client = new SchematicClient({
+      apiKey
+  })
+
+
+  const response = await client.plans.listPlans()
+  console.log(response)
+  return response.data
+}
+
 
 function Header() {
   return (
@@ -11,13 +39,15 @@ function Header() {
       <div className="container mx-auto">
         <div className="flex items-center justify-between h-16">
           {/* Left most content */}
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-16 gap-4">
             <Link href="/" className="flex items-center gap-4">
               <AgentPulse size="small" color="purple" />
               <h1 className="text-xl font-semibold bg-gradient-to-r from-purple-600 to-purple-400 bg-clip-text">
                 {APP_NAME}
               </h1>
             </Link>
+
+            <NavMenu />
           </div>
 
           {/* Right most content */}

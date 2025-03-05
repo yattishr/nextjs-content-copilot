@@ -12,14 +12,15 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="flex flex-col items-center gap-10 text-center mb-12">
             {/* <AgentPulse size="large" color="purple" /> */}
-            <h1 className="text-4xl md:text-6xl font-bold text-purple-400 mb-6">{APP_NAME}</h1>
-
+            
             <h2 className="text-4xl md:text-6xl font-bold text-gray-600 mb-6">
             Transform your video content with AI-powered analysis, {" "}
               <span className="bg-gradient-to-r from-purple-600 to-purple-400 bg-clip-text text-transparent">
               transcription, and insights. Get started in seconds.
               </span>
             </h2>
+
+            <h1 className="text-3xl md:text-6xl font-bold text-purple-400 mb-6">{APP_NAME}</h1>
 
             {/* YouTube video Form */}
             <YouTubeVideoForm />
