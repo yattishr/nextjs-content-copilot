@@ -20,7 +20,7 @@ export default function Home() {
               </span>
             </h2>
 
-            <h1 className="text-3xl md:text-6xl font-bold text-purple-400 mb-6">{APP_NAME}</h1>
+            <h1 className="text-3xl md:text-6xl font-bold text-purple-900 mb-6">{APP_NAME}</h1>
 
             {/* YouTube video Form */}
             <YouTubeVideoForm />

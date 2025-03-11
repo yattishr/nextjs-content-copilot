@@ -13,3 +13,8 @@ export interface ChannelDetails {
     thumbnail: string;
     subscribers: string;
 }
+
+export interface TranscriptEntry {
+    text: string;
+    timestamp: string;
+}
