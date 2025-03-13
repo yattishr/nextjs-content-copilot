@@ -3,6 +3,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { dark, neobrutalism, shadesOfPurple } from '@clerk/themes'
 import { SchematicProvider } from "@schematichq/schematic-react";
 import SchematicWrapped from "./SchematicWrapped";
+import { ConvexClientProvider } from "./ConvexClientProvider";
 
 export default function ClientWrapper({
   children,
@@ -16,13 +17,13 @@ export default function ClientWrapper({
   }
 
   return (
-    <ClerkProvider appearance={{baseTheme: shadesOfPurple}}>
+    <ConvexClientProvider>
       <SchematicProvider publishableKey={schematicPublishableKey}>
         <SchematicWrapped>
           {children}
         </SchematicWrapped>
       </SchematicProvider>
-    </ClerkProvider>
+    </ConvexClientProvider>
   )
 }
 

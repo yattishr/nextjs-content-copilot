@@ -4,10 +4,15 @@ import React from "react";
 import Usage from "./Usage";
 import { FeatureFlag } from "@/features/flags";
 import Image from "next/image";
+import { useQuery} from "convex/react"
+import { api } from "@/convex/_generated/api";
 
 function ThumbnailGeneration({ videoId }: { videoId: string }) {
   const { user } = useUser();
-  const images = [];
+  const images = useQuery(api.images.getImages, {
+    videoId,
+    userId: user?.id ?? ""
+  });
 
   return (
     <div className="rounded-xl flex flex-col p-4 border">
