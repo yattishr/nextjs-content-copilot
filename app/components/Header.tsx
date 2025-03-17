@@ -3,7 +3,7 @@ import Link from "next/link";
 import { APP_NAME, features } from "../constants";
 import AgentPulse from "./AgentPulse";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
-import { Button } from "@/components/ui/button";
+import { Button } from '../../components/ui/button';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -13,7 +13,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
   NavigationMenuViewport,
-} from "@/components/ui/navigation-menu"
+} from '../../components/ui/navigation-menu';
 import { SchematicClient } from "@schematichq/schematic-typescript-node"
 import NavMenu from "./NavMenu";
 

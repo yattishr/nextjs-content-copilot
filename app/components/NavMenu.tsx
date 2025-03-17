@@ -6,7 +6,7 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
+} from "../../components/ui/navigation-menu";
 
 function NavMenu() {
   return (
