@@ -6,7 +6,7 @@ export enum FeatureFlag {
     SCRIPT_GENERATION='script-generations',
 }
 
-export const featureFlagEvents: Record<FeatureFlag, { event: string}> = {
+export const featureFlagEvents: Record<FeatureFlag, { event: string }> = {
     [FeatureFlag.TRANSCRIPTION]: {
         event: 'transcribe'
     },

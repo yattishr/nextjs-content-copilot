@@ -3,7 +3,22 @@ import { Button } from "@/components/ui/button";
 import { useChat } from "@ai-sdk/react";
 import ReactMarkdown from "react-markdown";
 
-import React from "react";
+interface ToolInvocation {
+  toolCallId: string;
+  toolName: string;
+  result?: Record<string, unknown>
+}
+
+interface ToolPart {
+  type: "tool-invocation";
+  toolInvocation: ToolInvocation,
+}
+
+
+const formatToolInvocation = (part: ToolPart) => {
+  if (!part.toolInvocation) return "Unknown Tool"
+  return `🤖 Tool Used: ${part.toolInvocation.toolName}`
+}
 
 function AiAgentChat({ videoId }: { videoId: string }) {
   const { messages, input, handleInputChange, handleSubmit } = useChat({
@@ -21,7 +36,7 @@ function AiAgentChat({ videoId }: { videoId: string }) {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-4">
-        <div className="space--y-6">
+        <div className="space-y-6">
           {messages.length === 0 && (
             <div className="flex items-center justify-center h-full min-h-[200px]">
               <div className="text-center space-y-2">
@@ -43,9 +58,32 @@ function AiAgentChat({ videoId }: { videoId: string }) {
               >
                 {message.parts && message.role === "assistant" ? (
                     // Assistant message
-                  <div className="prose prose-sm max-w-none">
-                    <ReactMarkdown>{message.content}</ReactMarkdown>
-                  </div>
+                    <div className="space-y-3">
+                      {message.parts.map((part, i) => (
+                        part.type === "text" ? (
+                          <div key={i} className="prose prose-sm max-w-none">
+                            <ReactMarkdown>{message.content}</ReactMarkdown>
+                          </div>
+                        ) : part.type === 'tool-invocation' ? (
+                          <div key={i} className="bg-white/50 rounded-lg p-2 space-y-2 text-gray-800">
+                              <div className="font-semibold bg-blue-200">
+                                TOOL CALL
+                              </div>
+                              <div className="font-medium text-xs">
+                                {formatToolInvocation(part as ToolPart)}
+                              </div>
+                              {(part as ToolPart).toolInvocation.result && (
+                                <pre className="text-xs bg-white/75 p-2 rounded overflow-auto max-h-40">
+                                  {JSON.stringify((part as ToolPart).toolInvocation.result, null, 2)}
+                                </pre>
+                              )}
+                          </div>
+                        ) : null
+                      ))}
+
+
+                  
+                    </div>
                 ) : (
                     // User message
                   <div className="prose prose-sm max-w-none text-white">

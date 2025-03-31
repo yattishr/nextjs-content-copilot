@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAnthropic } from "@ai-sdk/anthropic"
-import { streamText, tool } from "ai"
+import { streamText } from "ai"
 import { currentUser } from "@clerk/nextjs/server";
 import { getVideoDetails } from "@/actions/getVideoDetails";
 import { fetchTranscript } from "@/tools/fetchTranscript";

@@ -6,13 +6,43 @@ import TitleGeneration from "@/app/components/TitleGeneration";
 import Transcription from "@/app/components/Transcription";
 import Usage from "@/app/components/Usage";
 import YouTubeVideoDetails from "@/app/components/YouTubeVideoDetails";
+import { Doc } from "@/convex/_generated/dataModel";
 import { FeatureFlag } from "@/features/flags";
+import { createOrGetVideo } from "@/lib/createOrGetVideo";
+import { useUser } from "@clerk/nextjs";
 import { useParams } from "next/navigation";
-import React from "react";
+import { toNamespacedPath } from "path";
+import React, { useEffect, useState } from "react";
 
 function AnalysisPage() {
+  const { user } = useUser();
   const params = useParams<{ videoId: string }>();
   const { videoId } = params;
+  const [video, setVideo] = useState<Doc<"videos"> | null | undefined>(
+    undefined
+  );
+
+
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const fetchVideo = async() => {
+      // Analyse the video and add the video to the Db
+      const response = await createOrGetVideo(videoId as string, user.id);
+      if (!response.success) {
+        toast.error("Error creating or retrieving the video", {
+          description: response.error,
+          duration: 10000
+        })
+      } else {
+        setVideo(response.data!)
+      }
+    }
+  
+    fetchVideo()
+
+  }, [videoId, user])
+  
 
 
   return (
