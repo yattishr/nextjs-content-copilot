@@ -6,18 +6,19 @@ import ReactMarkdown from "react-markdown";
 interface ToolInvocation {
   toolCallId: string;
   toolName: string;
-  result?: Record<string, unknown>;
+  result?: Record<string, unknown>
 }
 
 interface ToolPart {
   type: "tool-invocation";
-  toolInvocation: ToolInvocation;
+  toolInvocation: ToolInvocation,
 }
 
+
 const formatToolInvocation = (part: ToolPart) => {
-  if (!part.toolInvocation) return "Unknown Tool";
-  return `🤖 Tool Used: ${part.toolInvocation.toolName}`;
-};
+  if (!part.toolInvocation) return "Unknown Tool"
+  return `🤖 Tool Used: ${part.toolInvocation.toolName}`
+}
 
 function AiAgentChat({ videoId }: { videoId: string }) {
   const { messages, input, handleInputChange, handleSubmit } = useChat({
@@ -50,48 +51,41 @@ function AiAgentChat({ videoId }: { videoId: string }) {
           )}
 
           {messages.map((message, index) => (
-            <div
-              key={message.id}
-              className={`flex ${message.role === "user" ? "justify-end" : "justify-start"} space-x-4`}
-            >
+            <div key={message.id} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"} space-x-4`}>
               {/* Check whether system message or user message */}
               <div
                 className={`max-w-[85%] ${message.role === "user" ? "bg-blue-500" : "bg-gray-200"} rounded-2xl px-4 py-3`}
               >
                 {message.parts && message.role === "assistant" ? (
-                  // Assistant message
-                  <div className="space-y-3">
-                    {message.parts.map((part, i) =>
-                      part.type === "text" ? (
-                        <div key={i} className="prose prose-sm max-w-none">
-                          <ReactMarkdown>{message.content}</ReactMarkdown>
-                        </div>
-                      ) : part.type === "tool-invocation" ? (
-                        <div
-                          key={i}
-                          className="bg-white/50 rounded-lg p-2 space-y-2 text-gray-800"
-                        >
-                          <div className="font-semibold bg-blue-200">
-                            TOOL CALL
+                    // Assistant message
+                    <div className="space-y-3">
+                      {message.parts.map((part, i) => (
+                        part.type === "text" ? (
+                          <div key={i} className="prose prose-sm max-w-none">
+                            <ReactMarkdown>{message.content}</ReactMarkdown>
                           </div>
-                          <div className="font-medium text-xs">
-                            {formatToolInvocation(part as ToolPart)}
-                          </div>
-                          {(part as ToolPart).toolInvocation.result && (
-                            <pre className="text-xs bg-white/75 p-2 rounded overflow-auto max-h-40">
-                              {JSON.stringify(
-                                (part as ToolPart).toolInvocation.result,
-                                null,
-                                2
+                        ) : part.type === 'tool-invocation' ? (
+                          <div key={i} className="bg-white/50 rounded-lg p-2 space-y-2 text-gray-800">
+                              <div className="font-semibold bg-blue-200">
+                                TOOL CALL
+                              </div>
+                              <div className="font-medium text-xs">
+                                {formatToolInvocation(part as ToolPart)}
+                              </div>
+                              {(part as ToolPart).toolInvocation.result && (
+                                <pre className="text-xs bg-white/75 p-2 rounded overflow-auto max-h-40">
+                                  {JSON.stringify((part as ToolPart).toolInvocation.result, null, 2)}
+                                </pre>
                               )}
-                            </pre>
-                          )}
-                        </div>
-                      ) : null
-                    )}
-                  </div>
+                          </div>
+                        ) : null
+                      ))}
+
+
+                  
+                    </div>
                 ) : (
-                  // User message
+                    // User message
                   <div className="prose prose-sm max-w-none text-white">
                     <ReactMarkdown>{message.content}</ReactMarkdown>
                   </div>

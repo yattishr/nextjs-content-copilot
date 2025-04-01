@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/navigation-menu"
 import { SchematicClient } from "@schematichq/schematic-typescript-node"
 import NavMenu from "./NavMenu";
-import { Menu, Play } from "lucide-react";
+
 
 async function getPaymentPlan() { 
   const apiKey = process.env.NEXT_PUBLIC_SCHEMATIC_PUBLISHABLE_KEY
@@ -35,50 +35,53 @@ async function getPaymentPlan() {
 
 function Header() {
   return (
-    <header className="sticky top-0 left-0 bg-gradient-to-r from-blue-600 to-fuchsia-600 mx-auto px-4 py-6 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white text-blue-600">
-            <Play className="h-5 w-5 ml-0.5" />
+    <header className="sticky top-0 left-0 right-0 px-4 md:px-0 bg-white/80 backdrop-blur-sm border-b border-gray-200 z-50">
+      <div className="container mx-auto">
+        <div className="flex items-center justify-between h-16">
+          {/* Left most content */}
+          <div className="flex items-center justify-between h-16 gap-4">
+            <Link href="/" className="flex items-center gap-4">
+              <AgentPulse size="small" color="purple" />
+              <h1 className="text-xl font-semibold bg-gradient-to-r from-purple-600 to-purple-400 bg-clip-text">
+                {APP_NAME}
+              </h1>
+            </Link>
+
+            {/* <NavMenu /> */}
           </div>
-          <span className="text-white text-2xl font-bold">Creator CoPilot</span>
-        </Link>
-        <nav className="hidden md:flex items-center gap-8">
-          <Link href="#features" className="text-white hover:text-white/80 font-medium">
-            Features
-          </Link>
 
-
-          <SignedIn>
-
-          <Link href="/manage-plan" className="text-white hover:text-white/80 font-medium">
-            Manage Plan
-          </Link>
+          {/* Right most content */}
+          <div className="flex items-center gap-4">
+            <SignedIn>
+              <Link href="/manage-plan">
+                <Button
+                  variant="outline"
+                  className="mr-4 bg-gradient-to-r from-purple-600 to-purple-400 text-transparent bg-clip-text"
+                >
+                  Manage Plan
+                </Button>
+              </Link>
 
               {/* User Button */}
               <div className="p-2 w-10 h-10 flex items-center justify-center rounded-full border bg-purple-100 border-purple-200">
                 <UserButton />
-              </div>          
-          </SignedIn>
-          <Link href="#about" className="text-white hover:text-white/80 font-medium">
-            About
-          </Link>
+              </div>
+            </SignedIn>
 
-          <SignedOut>
+            <SignedOut>
               <SignInButton mode="modal">
                 <Button
-                  variant="outline"
-                  className="bg-transparent text-white border-white px-6 py-4 text-lg rounded-full hover:bg-white/10 transition-colors"
+                  variant="ghost"
+                  className="bg-gradient-to-r from-purple-600 to-purple-400 text-transparent bg-clip-text"
                 >
                   Sign In
                 </Button>
               </SignInButton>
             </SignedOut>
-
-        </nav>
-        <button className="md:hidden text-white">
-          <Menu className="h-6 w-6" />
-        </button>
-      </header>
+          </div>
+        </div>
+      </div>
+    </header>
   );
 }
 
