@@ -1,6 +1,9 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { useChat } from "@ai-sdk/react";
+import { FeatureFlag } from "@/features/flags";
+import { Message, useChat } from "@ai-sdk/react";
+import { useSchematicFlag } from "@schematichq/schematic-react";
+import { Image, LetterText, PenIcon, SendIcon } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
 interface ToolInvocation {
@@ -20,12 +23,55 @@ const formatToolInvocation = (part: ToolPart) => {
 };
 
 function AiAgentChat({ videoId }: { videoId: string }) {
-  const { messages, input, handleInputChange, handleSubmit } = useChat({
+  const { messages, input, handleInputChange, handleSubmit, append, status } = useChat({
     maxSteps: 5,
     body: {
       videoId,
     },
   });
+
+  const isScriptGenerationEnabled = useSchematicFlag(FeatureFlag.SCRIPT_GENERATION)
+
+  const isImageGenerationEnabled = useSchematicFlag(FeatureFlag.IMAGE_GENERATION)
+
+  const isTitleGenerationEnabled = useSchematicFlag(FeatureFlag.TITLE_GENERATIONS)
+
+  const isVideoAnalysisEnabled = useSchematicFlag(FeatureFlag.ANALYSE_VIDEO)
+
+  const generateScript = async () => {
+    const randomId = Math.random().toString(36).substring(2, 15)
+
+    const userMessage: Message = {
+      id: `generate-script-${randomId}`,
+      role: "user",
+      content: `Generate a step-by-step shooting script for this video that I can use on       
+      my own channel to produce a video that is similar to this one, don't do any other 
+      steps such as generating a image, just generate the script only.`
+    };
+    append(userMessage);
+  }
+
+  const generateImage = async () => {
+    const randomId = Math.random().toString(36).substring(2, 15)
+
+    const userMessage: Message = {
+      id: `generate-image-${randomId}`,
+      role: "user",
+      content: `Generate a thumbnail for this video.`
+    };
+    append(userMessage);
+  }  
+
+  const generateTitle = async () => {
+    const randomId = Math.random().toString(36).substring(2, 15)
+
+    const userMessage: Message = {
+      id: `generate-title-${randomId}`,
+      role: "user",
+      content: `Generate a title for this video. Add the words "Video Title: " as the prefix to the title.`
+    };
+    append(userMessage);
+  }    
 
   return (
     <div className="flex flex-col h-full">
@@ -56,7 +102,7 @@ function AiAgentChat({ videoId }: { videoId: string }) {
             >
               {/* Check whether system message or user message */}
               <div
-                className={`max-w-[85%] ${message.role === "user" ? "bg-blue-500" : "bg-gray-200"} rounded-2xl px-4 py-3`}
+                className={`max-w-[85%] ${message.role === "user" ? "bg-gray-50 border-2 border-purple-800" : "bg-gray-200"} rounded-2xl px-4 py-3`}
               >
                 {message.parts && message.role === "assistant" ? (
                   // Assistant message
@@ -92,7 +138,7 @@ function AiAgentChat({ videoId }: { videoId: string }) {
                   </div>
                 ) : (
                   // User message
-                  <div className="prose prose-sm max-w-none text-white">
+                  <div className="prose prose-sm max-w-none text-black">
                     <ReactMarkdown>{message.content}</ReactMarkdown>
                   </div>
                 )}
@@ -109,17 +155,93 @@ function AiAgentChat({ videoId }: { videoId: string }) {
             <input
               className="flex-1 px-4 py-2 text-sm border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               type="text"
-              placeholder="Enter your question..."
+              placeholder={!isVideoAnalysisEnabled
+                ? "Upgrade to ask anything about your video"
+                : "Ask anything about your video..."
+              }
               value={input}
               onChange={handleInputChange}
             />
             <Button
               type="submit"
-              className="px-4 py-2 bg-purple-500 text-white text-sm rounded-full hover:bg-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={
+                status === "streaming" ||
+                status === "submitted" ||
+                !isVideoAnalysisEnabled
+              }
+              className="px-4 py-2 bg-purple-500 
+                      text-white text-sm 
+                      rounded-full 
+                      hover:bg-purple-600 
+                      transition-colors 
+                      disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Send
+              {status === "streaming"
+              ? "AI is replying..."
+              : status === "submitted"
+                ? "AI is thinking..."
+              : <SendIcon />
+              }
             </Button>
           </form>
+
+          <div className="flex gap-2">
+            <button 
+              className="text-xs xl:text-sm w-full flex items-center justify-center 
+              gap-2 py-2 px-4 bg-gray-100 hover:bg-gray-200 
+              rounded-full transition-colors 
+              disabled:opacity-50 
+              disabled:cursor-not-allowed"
+              onClick={generateScript}
+              type="button"
+              disabled={!isScriptGenerationEnabled}
+            >
+              <LetterText className="w-4 h-4" />
+              {isScriptGenerationEnabled ? (
+                <span>Generate Script</span>
+              ) : (
+                <span>Upgrade to generate a Script</span>
+              )}
+            </button>
+
+            <button 
+              className="text-xs xl:text-sm w-full flex items-center justify-center 
+              gap-2 py-2 px-4 bg-gray-100 hover:bg-gray-200 
+              rounded-full transition-colors 
+              disabled:opacity-50 
+              disabled:cursor-not-allowed"
+              onClick={generateTitle}
+              type="button"
+              disabled={!isTitleGenerationEnabled}
+            >
+              <PenIcon className="w-4 h-4" />
+              {isTitleGenerationEnabled ? (
+                <span>Generate Title</span>
+              ) : (
+                <span>Upgrade to generate Titles</span>
+              )}
+            </button>
+
+            <button 
+              className="text-xs xl:text-sm w-full flex items-center justify-center 
+              gap-2 py-2 px-4 bg-gray-100 hover:bg-gray-200 
+              rounded-full transition-colors 
+              disabled:opacity-50 
+              disabled:cursor-not-allowed"
+              onClick={generateImage}
+              type="button"
+              disabled={!isImageGenerationEnabled}
+            >
+              <Image className="w-4 h-4" />
+              {isImageGenerationEnabled ? (
+                <span>Generate Image</span>
+              ) : (
+                <span>Upgrade to generate Images</span>
+              )}
+            </button>            
+
+          </div>
+
         </div>
       </div>
     </div>

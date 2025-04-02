@@ -54,7 +54,7 @@ function YouTubeVideoDetails({ videoId }: { videoId: string }) {
 
             <div>
               <p className="text-base @md:text-lg font-semibold text-gray-900">{video.channel.title}</p>
-              <p className="text-sm @md:text-base text-gray-600">{video.channel.subscribers} Subscribers</p>
+              <p className="text-sm @md:text-base text-gray-600">{new Intl.NumberFormat('en-US').format(Number(video.channel.subscribers))} Subscribers</p>
             </div>
           </div>
 

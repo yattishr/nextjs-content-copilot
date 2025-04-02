@@ -24,7 +24,7 @@ export async function POST(req: Request) {
 
     const videoDetails = await getVideoDetails(videoId)
 
-    const systemMessage = `You are an AI agent ready to accept questions from questions from the user about ONE specific video. 
+    const systemMessage = `You are an AI agent ready to accept questions from the user about ONE specific video. 
     The video ID in question is ${videoId} but you'll refer to this video as ${videoDetails?.title || "Selected Video"}. 
     Use emojis to make the conversation more engaging. If an error occurs, explain it to the user
     and ask them to try again. 
@@ -33,7 +33,7 @@ export async function POST(req: Request) {
     If any tool is used, analyze the response and if it contains a cache, explain that the transcript is 
     cached because they previously transcribed the video saving the user a token - use words like database instead of 
     cache to make it more easy to understand. 
-    Format for notion.`
+    Format for notion.`;
 
     console.log("Returning: ", messages)
 
