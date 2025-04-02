@@ -4,6 +4,7 @@ import { streamText } from "ai"
 import { currentUser } from "@clerk/nextjs/server";
 import { getVideoDetails } from "@/actions/getVideoDetails";
 import { fetchTranscript } from "@/tools/fetchTranscript";
+import { generateImage } from "@/tools/generateImage";
 
 const anthropic = createAnthropic({
     apiKey: process.env.CLAUDE_API_KEY,
@@ -47,7 +48,8 @@ export async function POST(req: Request) {
             ...messages
         ],
         tools: {
-            fetchTranscript
+            fetchTranscript: fetchTranscript,
+            generateImage: generateImage(videoId, user.id)
         }
 
     })

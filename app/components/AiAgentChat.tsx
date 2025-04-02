@@ -31,12 +31,16 @@ function AiAgentChat({ videoId }: { videoId: string }) {
   });
 
   const isScriptGenerationEnabled = useSchematicFlag(FeatureFlag.SCRIPT_GENERATION)
+  console.log("Logging isScriptGenerationEnabled: ", isScriptGenerationEnabled)
 
   const isImageGenerationEnabled = useSchematicFlag(FeatureFlag.IMAGE_GENERATION)
+  console.log("Logging isImageGenerationEnabled: ", isImageGenerationEnabled)
 
   const isTitleGenerationEnabled = useSchematicFlag(FeatureFlag.TITLE_GENERATIONS)
+  console.log("Logging isTitleGenerationEnabled: ", isTitleGenerationEnabled)
 
   const isVideoAnalysisEnabled = useSchematicFlag(FeatureFlag.ANALYSE_VIDEO)
+  console.log("Logging isVideoAnalysisEnabled: ", isVideoAnalysisEnabled)
 
   const generateScript = async () => {
     const randomId = Math.random().toString(36).substring(2, 15)
