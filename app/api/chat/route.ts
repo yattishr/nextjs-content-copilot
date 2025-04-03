@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
 import { createAnthropic } from "@ai-sdk/anthropic"
-import { streamText } from "ai"
+import { streamText, tool } from "ai"
 import { currentUser } from "@clerk/nextjs/server";
 import { getVideoDetails } from "@/actions/getVideoDetails";
 import { fetchTranscript } from "@/tools/fetchTranscript";
 import { generateImage } from "@/tools/generateImage";
+import { z } from "zod";
+import { getVideoIdFromUrl } from "@/lib/youtube/getVideoIdFromUrl";
+import { generateTitle } from "@/tools/generateTitle";
 
 const anthropic = createAnthropic({
     apiKey: process.env.CLAUDE_API_KEY,
@@ -25,7 +28,7 @@ export async function POST(req: Request) {
 
     const videoDetails = await getVideoDetails(videoId)
 
-    const systemMessage = `You are an AI agent ready to accept questions from the user about ONE specific video. 
+    const systemMessage = `You are an AI agent "Creator CoPilot" ready to accept questions from the user about ONE specific video. 
     The video ID in question is ${videoId} but you'll refer to this video as ${videoDetails?.title || "Selected Video"}. 
     Use emojis to make the conversation more engaging. If an error occurs, explain it to the user
     and ask them to try again. 
@@ -49,7 +52,28 @@ export async function POST(req: Request) {
         ],
         tools: {
             fetchTranscript: fetchTranscript,
-            generateImage: generateImage(videoId, user.id)
+            generateImage: generateImage(videoId, user.id),
+            generateTitle: generateTitle,
+            getVideoDetails: tool({
+                description: "Get the details of a YouTube video",
+                parameters: z.object({
+                    videoId: z.string().describe("The video ID to get the details for"),
+                }),
+                execute: async ({ videoId }) => {
+                    const videoDetails = await getVideoDetails(videoId);
+                    return { videoDetails }
+                }
+            }),
+            extractVideoId: tool({
+                description: "Extract the video ID from a URL",
+                parameters: z.object({
+                    url: z.string().describe("The URL to extract the video ID from"),
+                }),
+                execute: async ( {url }) => {
+                    const videoId = await getVideoIdFromUrl(url)
+                    return { videoId }
+                }
+            }),            
         }
 
     })

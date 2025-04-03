@@ -3,8 +3,10 @@ import { Button } from "@/components/ui/button";
 import { FeatureFlag } from "@/features/flags";
 import { Message, useChat } from "@ai-sdk/react";
 import { useSchematicFlag } from "@schematichq/schematic-react";
-import { Image, LetterText, PenIcon, SendIcon } from "lucide-react";
+import { BotIcon, Image, LetterText, PenIcon, SendIcon } from "lucide-react";
+import { useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
+import { toast } from "sonner";
 
 interface ToolInvocation {
   toolCallId: string;
@@ -23,59 +25,105 @@ const formatToolInvocation = (part: ToolPart) => {
 };
 
 function AiAgentChat({ videoId }: { videoId: string }) {
-  const { messages, input, handleInputChange, handleSubmit, append, status } = useChat({
-    maxSteps: 5,
-    body: {
-      videoId,
-    },
-  });
+  // scrolling to bottom logic
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
-  const isScriptGenerationEnabled = useSchematicFlag(FeatureFlag.SCRIPT_GENERATION)
-  console.log("Logging isScriptGenerationEnabled: ", isScriptGenerationEnabled)
+  const { messages, input, handleInputChange, handleSubmit, append, status } =
+    useChat({
+      maxSteps: 5,
+      body: {
+        videoId,
+      },
+    });
 
-  const isImageGenerationEnabled = useSchematicFlag(FeatureFlag.IMAGE_GENERATION)
-  console.log("Logging isImageGenerationEnabled: ", isImageGenerationEnabled)
+  const isScriptGenerationEnabled = useSchematicFlag(
+    FeatureFlag.SCRIPT_GENERATION
+  );
+  console.log("Logging isScriptGenerationEnabled: ", isScriptGenerationEnabled);
 
-  const isTitleGenerationEnabled = useSchematicFlag(FeatureFlag.TITLE_GENERATIONS)
-  console.log("Logging isTitleGenerationEnabled: ", isTitleGenerationEnabled)
+  const isImageGenerationEnabled = useSchematicFlag(
+    FeatureFlag.IMAGE_GENERATION
+  );
+  console.log("Logging isImageGenerationEnabled: ", isImageGenerationEnabled);
 
-  const isVideoAnalysisEnabled = useSchematicFlag(FeatureFlag.ANALYSE_VIDEO)
-  console.log("Logging isVideoAnalysisEnabled: ", isVideoAnalysisEnabled)
+  const isTitleGenerationEnabled = useSchematicFlag(
+    FeatureFlag.TITLE_GENERATIONS
+  );
+  console.log("Logging isTitleGenerationEnabled: ", isTitleGenerationEnabled);
+
+  const isVideoAnalysisEnabled = useSchematicFlag(FeatureFlag.ANALYSE_VIDEO);
+  console.log("Logging isVideoAnalysisEnabled: ", isVideoAnalysisEnabled);
 
   const generateScript = async () => {
-    const randomId = Math.random().toString(36).substring(2, 15)
+    const randomId = Math.random().toString(36).substring(2, 15);
 
     const userMessage: Message = {
       id: `generate-script-${randomId}`,
       role: "user",
       content: `Generate a step-by-step shooting script for this video that I can use on       
       my own channel to produce a video that is similar to this one, don't do any other 
-      steps such as generating a image, just generate the script only.`
+      steps such as generating a image, just generate the script only.`,
     };
     append(userMessage);
-  }
+  };
 
   const generateImage = async () => {
-    const randomId = Math.random().toString(36).substring(2, 15)
+    const randomId = Math.random().toString(36).substring(2, 15);
 
     const userMessage: Message = {
       id: `generate-image-${randomId}`,
       role: "user",
-      content: `Generate a thumbnail for this video.`
+      content: `Generate a thumbnail for this video.`,
     };
     append(userMessage);
-  }  
+  };
 
   const generateTitle = async () => {
-    const randomId = Math.random().toString(36).substring(2, 15)
+    const randomId = Math.random().toString(36).substring(2, 15);
 
     const userMessage: Message = {
       id: `generate-title-${randomId}`,
       role: "user",
-      content: `Generate a title for this video. Add the words "Video Title: " as the prefix to the title.`
+      content: `Generate a title for this video. Add the words "Video Title: " as the prefix to the title.`,
     };
     append(userMessage);
-  }    
+  };
+
+  useEffect(() => {
+    if (bottomRef.current && messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    }
+  }, [messages])
+  
+
+  useEffect(() => {
+    let toastId;
+
+    switch (status) {
+      case "submitted":
+        toastId = toast("Agent is thinking...", {
+          id: toastId,
+          icon: <BotIcon className="w-4 h-4 text-blue-600" />,
+        });
+        break;
+      case "streaming":
+        toastId = toast("Agent is replying...", {
+          id: toastId,
+          icon: <BotIcon className="w-4 h-4 text-green-500" />,
+        });
+        break;
+        case "error":
+          toastId = toast("Uh Oh! Something went wrong, please try again...", {
+            id: toastId,
+            icon: <BotIcon className="w-4 h-4 text-red-500" />,
+          });
+          break;        
+      case "ready":
+        toast.dismiss(toastId);
+        break;
+    }
+  }, [status]);
 
   return (
     <div className="flex flex-col h-full">
@@ -84,7 +132,7 @@ function AiAgentChat({ videoId }: { videoId: string }) {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-4">
+      <div className="flex-1 overflow-y-auto px-4 py-4" ref={messagesContainerRef}>
         <div className="space-y-6">
           {messages.length === 0 && (
             <div className="flex items-center justify-center h-full min-h-[200px]">
@@ -149,6 +197,7 @@ function AiAgentChat({ videoId }: { videoId: string }) {
               </div>
             </div>
           ))}
+          <div ref={bottomRef} />
         </div>
       </div>
 
@@ -159,9 +208,10 @@ function AiAgentChat({ videoId }: { videoId: string }) {
             <input
               className="flex-1 px-4 py-2 text-sm border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               type="text"
-              placeholder={!isVideoAnalysisEnabled
-                ? "Upgrade to ask anything about your video"
-                : "Ask anything about your video..."
+              placeholder={
+                !isVideoAnalysisEnabled
+                  ? "Upgrade to ask anything about your video"
+                  : "Ask anything about your video..."
               }
               value={input}
               onChange={handleInputChange}
@@ -180,17 +230,18 @@ function AiAgentChat({ videoId }: { videoId: string }) {
                       transition-colors 
                       disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {status === "streaming"
-              ? "AI is replying..."
-              : status === "submitted"
-                ? "AI is thinking..."
-              : <SendIcon />
-              }
+              {status === "streaming" ? (
+                "AI is replying..."
+              ) : status === "submitted" ? (
+                "AI is thinking..."
+              ) : (
+                <SendIcon />
+              )}
             </Button>
           </form>
 
           <div className="flex gap-2">
-            <button 
+            <button
               className="text-xs xl:text-sm w-full flex items-center justify-center 
               gap-2 py-2 px-4 bg-gray-100 hover:bg-gray-200 
               rounded-full transition-colors 
@@ -208,7 +259,7 @@ function AiAgentChat({ videoId }: { videoId: string }) {
               )}
             </button>
 
-            <button 
+            <button
               className="text-xs xl:text-sm w-full flex items-center justify-center 
               gap-2 py-2 px-4 bg-gray-100 hover:bg-gray-200 
               rounded-full transition-colors 
@@ -226,7 +277,7 @@ function AiAgentChat({ videoId }: { videoId: string }) {
               )}
             </button>
 
-            <button 
+            <button
               className="text-xs xl:text-sm w-full flex items-center justify-center 
               gap-2 py-2 px-4 bg-gray-100 hover:bg-gray-200 
               rounded-full transition-colors 
@@ -242,10 +293,8 @@ function AiAgentChat({ videoId }: { videoId: string }) {
               ) : (
                 <span>Upgrade to generate Images</span>
               )}
-            </button>            
-
+            </button>
           </div>
-
         </div>
       </div>
     </div>

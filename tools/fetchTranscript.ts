@@ -10,7 +10,7 @@ export const fetchTranscript = tool ({
             .string()
             .describe("The video ID to fetch the transcript for.")
     }),
-    execute: async ({ videoId}) => {
+    execute: async ({ videoId }) => {
         const transcript = await getYouTubeTranscript(videoId);
         return {
             transcript: transcript?.transcript,
